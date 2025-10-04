@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useBatchCalls, type BatchCall } from '@/hooks/use-batch-calls'
 import { useDelegationStatus } from '@/hooks/use-delegation-status'
-import { encodeFunctionData, parseEther } from 'viem'
+import { parseEther } from 'viem'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -100,25 +100,6 @@ export function BatchTransactionV2() {
     }
   }
 
-  // Example calls for testing
-  const loadExampleCalls = () => {
-    // Example: Send 0.0001 ETH to two EOA addresses
-    // ⚠️ Make sure these are real EOA wallets, NOT delegated EIP-7702 accounts!
-    // ⚠️ data MUST be '0x' (empty) for EOA transfers, not '0x00'!
-    setCalls([
-      {
-        to: '0x32d19F868559AC212555B41C0Eb35FB2EECD7877', // Example EOA #1
-        value: '0.0001',
-        data: '0x',
-      },
-      {
-        to: '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC', // Example EOA #2
-        value: '0.0001',
-        data: '0x',
-      },
-    ])
-  }
-
   return (
     <div className="space-y-6">
       {/* Support Status - only show after checking */}
@@ -161,19 +142,6 @@ export function BatchTransactionV2() {
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">Batch Calls</h3>
-          <Button 
-            type="button" 
-            variant="outline" 
-            size="sm"
-            onClick={loadExampleCalls}
-          >
-            <Info className="h-4 w-4 mr-2" />
-            Load Example
-          </Button>
-        </div>
-
         {calls.map((call, index) => (
           <Card key={index}>
             <CardHeader className="pb-3">

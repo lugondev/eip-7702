@@ -112,11 +112,10 @@ pnpm dev
 3. Switch to **Sepolia testnet**
 4. Get test ETH from [Sepolia Faucet](https://sepoliafaucet.com/)
 5. Go to **"Batch (EIP-7702)"** tab
-6. Click **"Load Example"** to populate test transactions
-7. Click **"Execute Batch"**
-8. MetaMask prompts: **"Upgrade to Smart Account?"** → Approve
-9. All transactions execute atomically! 🎉
-10. Check result on Etherscan
+6. Click **"Execute Batch"**
+7. MetaMask prompts: **"Upgrade to Smart Account?"** → Approve
+8. All transactions execute atomically! 🎉
+9. Check result on Etherscan
 
 **That's it! No manual authorization needed - MetaMask handles everything!**
 
@@ -154,27 +153,6 @@ struct Execution {
 
 function execute(Execution calldata _execution) external payable;
 ```
-
-### EIP7702Implementation.sol
-
-**Address**: `0x9d9235798a073e9A28B95D26eA5d451551d78b7b` (Sepolia)
-
-Stateful implementation with advanced features:
-- **Batch Execution**: Multiple calls in one transaction
-- **Operator Management**: Delegate execution rights
-- **Session Keys**: Temporary keys with expiration
-- **Nonce Management**: Replay attack protection
-- **Pausable**: Emergency pause functionality
-
-### EIP7702Paymaster.sol
-
-**Address**: `0x1414996cA3110BaB2DB175B0Df4aCaB3884F6632` (Sepolia)
-
-Contract paymaster for gas sponsorship:
-- **Sponsorship Management**: Manage sponsors and funding
-- **Token Payments**: Pay gas with tokens
-- **Whitelist**: Control sponsored users
-- **Rate Configuration**: Set exchange rates
 
 ## Frontend Features
 
@@ -279,14 +257,76 @@ pnpm frontend:type-check
 
 ## Deployment
 
-### Testnet Deployment
+### Deploy to Vercel (Recommended)
+
+#### Option 1: Deploy via Vercel Dashboard (Easiest)
+
+1. Push your code to GitHub/GitLab/Bitbucket
+2. Go to [vercel.com](https://vercel.com)
+3. Click **"Import Project"**
+4. Select your repository
+5. Configure environment variables:
+   - `NEXT_PUBLIC_SEPOLIA_RPC_URL`
+   - `NEXT_PUBLIC_PIMLICO_API_KEY` (optional, for EIP-7710)
+6. Click **"Deploy"**
+7. Done! Your app is live 🎉
+
+#### Option 2: Deploy via Vercel CLI
+
+```bash
+# Install Vercel CLI globally (if not installed)
+pnpm add -g vercel
+
+# Login to Vercel
+vercel login
+
+# Build and deploy to production
+pnpm build
+vercel --prod
+
+# Or deploy preview (for testing)
+vercel
+```
+
+#### Environment Variables Setup on Vercel
+
+Go to your project settings → Environment Variables and add:
+
+```env
+NEXT_PUBLIC_SEPOLIA_RPC_URL=https://eth-sepolia.g.alchemy.com/v2/YOUR_KEY
+NEXT_PUBLIC_PIMLICO_API_KEY=your_pimlico_api_key
+```
+
+**Note**: Environment variables with `NEXT_PUBLIC_` prefix are exposed to the browser.
+
+### Deploy to Other Platforms
+
+#### Netlify
+```bash
+pnpm build
+# Deploy .next folder
+```
+
+#### Self-hosted (VPS/AWS/DigitalOcean)
+```bash
+# Build application
+pnpm build
+
+# Start production server
+pnpm start
+
+# Or use PM2 for process management
+pm2 start pnpm --name "eip-7702" -- start
+```
+
+### Testnet Deployment (Contracts Only)
 
 1. Configure `.env` with RPC URLs and private keys
 2. Deploy contracts: `pnpm contracts:deploy --network sepolia`
-3. Update contract addresses trong frontend
-4. Build frontend: `pnpm frontend:build`
+3. Update contract addresses in frontend
+4. Build frontend: `pnpm build`
 
-### Mainnet Deployment
+### Mainnet Deployment (Contracts Only)
 
 1. Audit contracts thoroughly
 2. Test on testnet first

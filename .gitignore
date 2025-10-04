@@ -40,3 +40,4 @@ pids
 *.pid.lock
 
 .docs/
+.vercel
