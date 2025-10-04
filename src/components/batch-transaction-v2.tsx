@@ -263,12 +263,23 @@ export function BatchTransactionV2() {
 
       {/* Success */}
       {isSuccess && lastResult && (
-        <Alert>
-          <CheckCircle className="h-4 w-4" />
+        <Alert className="bg-green-50 border-green-200">
+          <CheckCircle className="h-4 w-4 text-green-600" />
           <AlertDescription>
-            <strong>✅ Batch transaction submitted!</strong>
-            <br />
-            <span className="text-sm">Result: <code className="text-xs">{JSON.stringify(lastResult)}</code></span>
+            <div className="space-y-2">
+              <p className="font-semibold text-green-900">✅ Batch transaction submitted!</p>
+              <div className="space-y-1">
+                <p className="text-sm text-green-800">
+                  <strong>Batch ID:</strong>
+                </p>
+                <code className="block text-xs bg-white px-3 py-2 rounded border border-green-300 break-all font-mono">
+                  {typeof lastResult === 'string' ? lastResult : JSON.stringify(lastResult)}
+                </code>
+                <p className="text-xs text-green-700 mt-2">
+                  💡 Copy this Batch ID to check the transaction status and results
+                </p>
+              </div>
+            </div>
           </AlertDescription>
         </Alert>
       )}

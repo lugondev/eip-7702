@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useAccount } from 'wagmi'
 import { WalletConnect } from '@/components/wallet-connect'
 import { BatchTransactionV2 } from '@/components/batch-transaction-v2'
+import { BatchResultChecker } from '@/components/batch-result-checker'
 import { AccountInfo } from '@/components/account-info'
 import { NetworkStatus } from '@/components/network-status'
 import { DelegationStatus } from '@/components/delegation-status'
@@ -13,7 +14,7 @@ import { StepProvider } from '@/components/providers/step-provider'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Zap, Info, Workflow } from 'lucide-react'
+import { Zap, Info, Workflow, ClipboardCheck } from 'lucide-react'
 import type { Address } from 'viem'
 
 const STATELESS_DELEGATOR_ADDRESS = (
@@ -62,10 +63,14 @@ export function EIP7702Dashboard() {
             </div>
 
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="batch">
                   <Zap className="h-4 w-4 mr-2" />
                   Batch (EIP-7702)
+                </TabsTrigger>
+                <TabsTrigger value="check">
+                  <ClipboardCheck className="h-4 w-4 mr-2" />
+                  Check Result
                 </TabsTrigger>
                 <TabsTrigger value="delegation">
                   <Workflow className="h-4 w-4 mr-2" />
@@ -95,6 +100,10 @@ export function EIP7702Dashboard() {
                     </CardContent>
                   </Card>
                 </div>
+              </TabsContent>
+
+              <TabsContent value="check" className="mt-6">
+                <BatchResultChecker />
               </TabsContent>
 
               <TabsContent value="delegation" className="mt-6">
