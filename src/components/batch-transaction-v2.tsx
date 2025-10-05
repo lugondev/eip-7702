@@ -1,15 +1,21 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useAccount } from 'wagmi'
 import { useBatchCalls, type BatchCall } from '@/hooks/use-batch-calls'
 import { useDelegationStatus } from '@/hooks/use-delegation-status'
+import { useGasEstimation } from '@/hooks/use-gas-estimation'
+import { useTransactionHistory } from '@/hooks/use-transaction-history'
+import { GasEstimationDisplay } from '@/components/gas-estimation-display'
+import { BatchTemplatePicker } from '@/components/batch-template-picker'
+import type { BatchTemplate } from '@/lib/batch-templates'
 import { parseEther } from 'viem'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Plus, Minus, Send, AlertCircle, CheckCircle, Loader2, Info, Shield } from 'lucide-react'
+import { Plus, Minus, Send, AlertCircle, CheckCircle, Loader2, Info, Shield, Fuel } from 'lucide-react'
 import type { Address, Hex } from 'viem'
 
 /**
@@ -30,23 +36,43 @@ const STATELESS_DELEGATOR_ADDRESS = (
 ) as Address
 
 export function BatchTransactionV2() {
+  const { address } = useAccount()
   const {
-    lastResult,
-    isSupported,
     isLoading,
-    isSuccess,
     error,
     executeBatchCalls,
-    checkSupport,
     isConnected,
     chainId,
   } = useBatchCalls()
 
   const { isDelegated, isChecking: isCheckingDelegation } = useDelegationStatus(STATELESS_DELEGATOR_ADDRESS)
+  
+  const { 
+    isEstimating, 
+    estimate, 
+    error: estimateError,
+    estimateGas,
+    clearEstimate 
+  } = useGasEstimation()
+
+  const { addRecord, updateRecord } = useTransactionHistory()
 
   const [calls, setCalls] = useState<CallForm[]>([
     { to: '', value: '0', data: '0x' }
   ])
+  const [showEstimate, setShowEstimate] = useState(false)
+  const [loadedTemplate, setLoadedTemplate] = useState<string | null>(null)
+
+  const handleLoadTemplate = (template: BatchTemplate) => {
+    setCalls(template.calls.map(call => ({
+      to: call.to,
+      value: call.value,
+      data: call.data
+    })))
+    setLoadedTemplate(template.name)
+    clearEstimate()
+    setShowEstimate(false)
+  }
 
   const addCall = () => {
     setCalls([...calls, { to: '', value: '0', data: '0x' }])
@@ -62,21 +88,64 @@ export function BatchTransactionV2() {
     const newCalls = [...calls]
     newCalls[index][field] = value
     setCalls(newCalls)
+    // Clear estimate when calls change
+    if (estimate) {
+      clearEstimate()
+      setShowEstimate(false)
+    }
+  }
+
+  // Auto-estimate when calls are ready
+  useEffect(() => {
+    const autoEstimate = async () => {
+      if (!showEstimate || !isConnected) return
+      
+      const validCalls: BatchCall[] = calls
+        .filter(call => call.to && call.to.length > 2)
+        .map(call => ({
+          to: call.to as Address,
+          data: (call.data || '0x') as Hex,
+          value: call.value ? parseEther(call.value) : BigInt(0),
+        }))
+
+      if (validCalls.length > 0) {
+        try {
+          await estimateGas(validCalls)
+        } catch (err) {
+          console.error('Auto estimate failed:', err)
+        }
+      }
+    }
+
+    autoEstimate()
+  }, [showEstimate, isConnected])
+
+  const handleEstimate = async () => {
+    const validCalls: BatchCall[] = calls
+      .filter(call => call.to && call.to.length > 2)
+      .map(call => ({
+        to: call.to as Address,
+        data: (call.data || '0x') as Hex,
+        value: call.value ? parseEther(call.value) : BigInt(0),
+      }))
+
+    if (validCalls.length === 0) {
+      alert('Please add at least one valid call')
+      return
+    }
+
+    try {
+      await estimateGas(validCalls)
+      setShowEstimate(true)
+    } catch (err) {
+      console.error('Estimation failed:', err)
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     try {
-      // Check support first if haven't checked yet
-      if (isSupported === null) {
-        console.log('🔍 Checking wallet support first...')
-        const supported = await checkSupport()
-        if (!supported) {
-          return // checkSupport will set error state
-        }
-      }
-      
       // Validate and convert calls
       const validCalls: BatchCall[] = calls
         .filter(call => call.to && call.to.length > 2)
@@ -92,7 +161,56 @@ export function BatchTransactionV2() {
       }
 
       console.log('🚀 Submitting batch calls:', validCalls)
-      await executeBatchCalls(validCalls)
+      
+      // Create transaction record
+      const txId = `tx_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      
+      if (!address) {
+        alert('Wallet not connected')
+        return
+      }
+      
+      addRecord({
+        id: txId,
+        chainId: chainId || 1,
+        from: address,
+        calls: validCalls.map(call => ({
+          to: call.to,
+          value: call.value?.toString() || '0',
+          data: call.data || '0x'
+        })),
+        status: 'pending',
+        gasEstimate: estimate ? {
+          total: estimate.total.toString(),
+          totalEth: estimate.totalEth,
+          savings: estimate.savingsEth
+        } : undefined,
+        template: loadedTemplate || undefined
+      })
+      
+      try {
+        const result = await executeBatchCalls(validCalls)
+        
+        // Update status on success
+        if (result) {
+          updateRecord(txId, {
+            status: 'confirmed',
+            receipts: [{
+              transactionHash: typeof result === 'string' ? result : JSON.stringify(result),
+              blockNumber: '0', // Will be updated when confirmed
+              gasUsed: '0',
+              status: '1'
+            }]
+          })
+        }
+      } catch (execError) {
+        // Update status on failure
+        updateRecord(txId, {
+          status: 'failed',
+          error: execError instanceof Error ? execError.message : 'Transaction failed'
+        })
+        throw execError
+      }
       
       // Success will be shown via isSuccess state
     } catch (err) {
@@ -102,30 +220,15 @@ export function BatchTransactionV2() {
 
   return (
     <div className="space-y-6">
-      {/* Support Status - only show after checking */}
-      {isConnected && isSupported !== null && (
-        <Alert>
-          {isSupported === true ? (
-            <>
-              <CheckCircle className="h-4 w-4" />
-              <AlertDescription>
-                <strong>✅ Wallet supports EIP-7702!</strong>
-                <br />
-                Batch transactions will be executed via <code>wallet_sendCalls</code>.
-              </AlertDescription>
-            </>
-          ) : (
-            <>
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>
-                <strong>⚠️ Wallet does not support EIP-7702</strong>
-                <br />
-                Requires latest MetaMask version with EIP-7702 support.
-              </AlertDescription>
-            </>
-          )}
-        </Alert>
-      )}
+      {/* EIP-7702 Info */}
+      <Alert>
+        <Info className="h-4 w-4" />
+        <AlertDescription>
+          <strong>EIP-7702 Batch Transactions</strong>
+          <br />
+          Batch transactions will be executed via <code>wallet_sendCalls</code>. Requires MetaMask with EIP-7702 support.
+        </AlertDescription>
+      </Alert>
 
       {/* Delegation Required Warning */}
       {isConnected && !isCheckingDelegation && isDelegated === false && (
@@ -139,6 +242,19 @@ export function BatchTransactionV2() {
           </AlertDescription>
         </Alert>
       )}
+
+      {/* Template Picker */}
+      <div className="flex items-center gap-2">
+        <BatchTemplatePicker onSelectTemplate={handleLoadTemplate} />
+        {loadedTemplate && (
+          <Alert className="flex-1 py-2">
+            <CheckCircle className="h-4 w-4 text-green-600" />
+            <AlertDescription className="text-sm">
+              <strong>Loaded:</strong> {loadedTemplate}
+            </AlertDescription>
+          </Alert>
+        )}
+      </div>
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -203,10 +319,29 @@ export function BatchTransactionV2() {
             <Plus className="h-4 w-4 mr-2" />
             Add Call
           </Button>
+
+          <Button 
+            type="button" 
+            variant="outline"
+            onClick={handleEstimate}
+            disabled={isEstimating || !isConnected}
+          >
+            {isEstimating ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                Estimating...
+              </>
+            ) : (
+              <>
+                <Fuel className="h-4 w-4 mr-2" />
+                Estimate Gas
+              </>
+            )}
+          </Button>
           
           <Button 
             type="submit" 
-            disabled={isLoading || !isConnected || isSupported === false} 
+            disabled={isLoading || !isConnected} 
             className="flex-1"
           >
             {isLoading ? (
@@ -229,28 +364,22 @@ export function BatchTransactionV2() {
         </div>
       </form>
 
-      {/* Success */}
-      {isSuccess && lastResult && (
-        <Alert className="bg-green-50 border-green-200">
-          <CheckCircle className="h-4 w-4 text-green-600" />
+      {/* Gas Estimation Display */}
+      {estimate && showEstimate && !isEstimating && (
+        <GasEstimationDisplay estimate={estimate} callCount={calls.filter(c => c.to).length} />
+      )}
+
+      {/* Estimation Error */}
+      {estimateError && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            <div className="space-y-2">
-              <p className="font-semibold text-green-900">✅ Batch transaction submitted!</p>
-              <div className="space-y-1">
-                <p className="text-sm text-green-800">
-                  <strong>Batch ID:</strong>
-                </p>
-                <code className="block text-xs bg-white px-3 py-2 rounded border border-green-300 break-all font-mono">
-                  {typeof lastResult === 'string' ? lastResult : JSON.stringify(lastResult)}
-                </code>
-                <p className="text-xs text-green-700 mt-2">
-                  💡 Copy this Batch ID to check the transaction status and results
-                </p>
-              </div>
-            </div>
+            <strong>Gas Estimation Failed:</strong> {estimateError}
           </AlertDescription>
         </Alert>
       )}
+
+      {/* Success message will be shown in transaction history */}
 
       {/* Error */}
       {error && (

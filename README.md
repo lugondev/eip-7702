@@ -31,12 +31,22 @@ Powerful approach using **@metamask/delegation-toolkit**:
 
 ## 📚 Documentation
 
+### 📖 In-App Documentation
+- **[/docs](http://localhost:3000/docs)** - Complete EIP-7702 specification, motivation, and technical details
+- **[/reference](http://localhost:3000/reference)** - Code examples, tutorials, and best practices
+- **[Demo](http://localhost:3000)** - Live interactive demo with batch transactions and delegation
+
+### 📝 Project Guides
 - [EIP-7702 Implementation Guide](.docs/wagmi-viem-implementation.md)
 - [EIP-7710 Delegation Toolkit Guide](.docs/delegation-toolkit-implementation.md)
 - [Comparison V1 vs V2](.docs/comparison-v1-vs-v2.md)
+- **[Revoke Delegation Guide](.docs/revoke-delegation-guide.md)** ← NEW! Complete guide with 4 methods
+- [Revoke Implementation](.docs/REVOKE_IMPLEMENTATION.md) - Quick start & API reference
+- [Revoke Examples](.docs/revoke-examples.tsx) - Copy-paste code snippets
 
 ## Main Features
 
+### 🎯 Core Features
 - 🔐 **Authorization Signing**: Sign authorization to delegate EOA to smart contract
 - ⚡ **Batch Transactions V2** (NEW): Modern approach with `useSendCalls` - MetaMask automatically handles authorization
 - ⚡ **Batch Transactions V1**: Manual authorization flow for advanced use cases
@@ -45,24 +55,87 @@ Powerful approach using **@metamask/delegation-toolkit**:
 - 👥 **Operator Management**: Manage operator permissions for accounts
 - 📊 **Monitoring**: Track delegation status and activities
 
+### 📚 NEW Features (Phase 1 - October 2025)
+- 🔐 **Revoke Delegation**: Reset account to normal EOA - clear delegation anytime
+  - Full UI component with status display
+  - Multiple revoke methods (Component, Hook, Viem)
+  - Manual guide modal for troubleshooting
+  - Auto-refresh after revoke
+  - Complete documentation with examples
+- ⛽ **Gas Estimation**: See gas costs before submitting - compare batch vs sequential
+- 🎯 **Preset Templates**: 8 ready-to-use templates for common use cases (DeFi, NFT, Transfers)
+  - Multi-Token Transfer
+  - DeFi Approve + Swap
+  - NFT Batch Mint
+  - Social Recovery Setup
+  - Payment Batch
+  - Test Templates (Simple & Self-transfers)
+
+### 📚 NEW Features (Phase 2 - October 2025)
+- 📜 **Transaction History**: Auto-save all batch transactions with full details
+  - Persistent localStorage storage (last 100 transactions)
+  - Search and filter by status, date, or batch ID
+  - Export/Import history as JSON
+  - Statistics dashboard (total, confirmed, pending, failed)
+  - Quick access to transaction details and receipts
+- 🔍 **Enhanced Result Viewer**: Detailed transaction decoder and analyzer
+  - **Function Decoder**: Automatically decode 50+ common function signatures
+    - ERC20: transfer, approve, transferFrom
+    - ERC721/1155: safeTransferFrom, setApprovalForAll
+    - Uniswap V2/V3: swap functions
+    - WETH: deposit, withdraw
+  - **Transaction Details**: Beautiful UI showing:
+    - Decoded function names and arguments
+    - Transaction type detection (Transfer, Swap, Approval, etc.)
+    - Gas usage with color-coded warnings
+    - Value transfers in ETH and wei
+    - Raw data with copy-to-clipboard
+  - **Visual Timeline**: Step-by-step execution flow
+    - Transaction submitted timestamp
+    - Confirmation with block number
+    - Failed status with error messages
+  - **Share & Export**: Share transaction details easily
+  - **Expandable Call Details**: Click to view full details for each call
+  - **Etherscan Integration**: Direct links to addresses and transactions
+
+### 📚 Documentation Features
+- 📖 **Interactive Docs Page**: Complete EIP-7702 specification with examples
+- 💻 **Code Reference**: Copy-paste ready code snippets for all use cases
+- 🎨 **Visual Flow Diagrams**: Step-by-step visualization of EIP-7702 and EIP-7710 processes
+- 🧭 **Navigation Bar**: Easy access to Demo, Docs, and Reference sections
+- ✅ **Best Practices Guide**: Production-ready recommendations and troubleshooting
+
 ## Project Structure
 
 ```
 eip-7702/
-├── packages/
-│   ├── contracts/          # Smart contracts (Hardhat)
-│   │   ├── contracts/      # Solidity contracts
-│   │   ├── scripts/        # Deployment scripts  
-│   │   ├── test/          # Contract tests
-│   │   └── typechain-types/ # Generated types
-│   ├── frontend/          # Next.js 15 frontend
-│   │   ├── src/
-│   │   │   ├── app/       # App Router pages
-│   │   │   ├── components/ # React components
-│   │   │   ├── hooks/     # Custom hooks
-│   │   │   ├── lib/       # Utilities
-│   │   │   └── types/     # TypeScript types
-│   └── shared/            # Shared utilities
+├── src/
+│   ├── app/                       # Next.js 15 App Router
+│   │   ├── page.tsx              # Home/Demo page
+│   │   ├── docs/                 # Documentation pages
+│   │   │   └── page.tsx          # EIP-7702 specification
+│   │   ├── reference/            # Code reference pages
+│   │   │   └── page.tsx          # Examples & tutorials
+│   │   ├── layout.tsx            # Root layout with navigation
+│   │   └── globals.css           # Global styles
+│   ├── components/               # React components
+│   │   ├── dashboard.tsx         # Main dashboard with tabs
+│   │   ├── navigation.tsx        # App navigation bar
+│   │   ├── batch-transaction-v2.tsx  # Batch transaction form
+│   │   ├── eip7702-flow-diagram.tsx  # Visual flow diagram
+│   │   ├── delegation-flow-diagram.tsx  # Delegation flow
+│   │   ├── delegation/           # Delegation components
+│   │   ├── providers/            # Context providers
+│   │   └── ui/                   # UI components (shadcn)
+│   ├── hooks/                    # Custom React hooks
+│   │   ├── use-batch-calls.ts    # Batch transaction logic
+│   │   ├── use-delegation-status.ts
+│   │   └── use-pimlico-utils.ts  # Paymaster integration
+│   ├── lib/                      # Utilities & config
+│   │   ├── wagmi.ts             # Wagmi configuration
+│   │   ├── utils.ts             # Helper functions
+│   │   └── abis/                # Contract ABIs
+│   └── types/                    # TypeScript types
 └── README.md
 ```
 
@@ -132,6 +205,21 @@ pnpm dev
 
 **Advanced**: Delegation stored in localStorage, gas sponsored by Pimlico Paymaster!
 
+### 6. Test Revoke Delegation
+
+1. Go to **"/revoke"** page or click **"Revoke Delegation"** in dashboard
+2. **Check Status**: View current delegation status
+3. Click **"Revoke Delegation"** button
+4. Confirm transaction in MetaMask
+5. Wait for confirmation (~2-3 seconds)
+6. Account reverted to normal EOA! 🎉
+
+**Alternative Methods:**
+- Use component: `<RevokeDelegationButton />`
+- Use hook: `const { revokeDelegation } = useRevokeDelegation()`
+- MetaMask UI: Account Details → Switch to EOA
+- See full guide: [.docs/revoke-delegation-guide.md](.docs/revoke-delegation-guide.md)
+
 ## Smart Contracts
 
 ### 🌟 EIP7702StatelessDelegator (Recommended)
@@ -162,24 +250,48 @@ function execute(Execution calldata _execution) external payable;
 - **Viem 2.37.12** for EIP-7702 support
 - **Wagmi 2.x** for wallet management
 - **Tailwind CSS** + Radix UI for styling
+- **shadcn/ui** for component library
+
+### Main Pages
+
+- **[Home /](/)**: Interactive demo with batch transactions and delegation
+- **[Revoke /revoke](/revoke)**: ← NEW! Revoke delegation page with full UI
+- **[Docs /docs](/docs)**: Complete EIP-7702 specification and guides
+- **[Reference /reference](/reference)**: Code examples, tutorials, and best practices
 
 ### Main Components
 
-- **Dashboard**: Main interface with 4 tabs (Authorize, Batch, Manage, Info)
-- **AuthorizationForm**: 
-  - Sign EIP-7702 authorization
-  - Send test transaction with authorization
-  - Display authorization details
-  - Link to Etherscan
-- **BatchTransactionForm**: 
+- **Dashboard**: Main interface with 4 tabs (Batch, Check Result, Delegation, Info)
+- **Navigation**: App-wide navigation bar with Demo, Docs, Reference links
+- **RevokeDelegationButton**: ← NEW! Full UI component for revoking delegation
+  - Status display with delegated address
+  - Revoke button with loading states
+  - Manual guide modal
+  - Success/Error messages
+  - Etherscan links
+- **EIP7702FlowDiagram**: Visual guide showing the EIP-7702 transaction flow
+- **DelegationFlowDiagram**: Step-by-step visualization of EIP-7710 delegation process
+- **BatchTransactionV2**: 
   - Create multiple transaction calls
   - Auto sign authorization + encode + send
   - Atomic execution (all or nothing)
+  - Uses `useSendCalls` hook (ERC-5792)
+- **BatchResultChecker**: Check status and results of batch transactions
+- **Steps** (Delegation): 5-step wizard for delegation workflow
 - **WalletConnect**: MetaMask connection with network detection
 - **AccountInfo**: Display address, balance, delegation status
 
 ### Hooks
 
+- **useRevokeDelegation**: ← NEW! Revoke delegation logic
+  - Multiple revoke methods (MetaMask, Viem, Contract)
+  - Delegation status checking
+  - Error handling with helpful messages
+  - Transaction tracking
+- **useDelegationStatus**: ← NEW! Check delegation state
+  - Check if account is delegated
+  - Get delegated contract address
+  - Auto-refresh capabilities
 - **useEIP7702Authorization**: 
   - Sign authorization following MetaMask Toolkit pattern
   - Browser wallet compatible (personal_sign)

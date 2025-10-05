@@ -1,13 +1,17 @@
 'use client'
 
 import { useState } from 'react'
+import { useAccount } from 'wagmi'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
-import { Search, Loader2, CheckCircle, XCircle, Clock, AlertCircle, ExternalLink } from 'lucide-react'
+import { Search, Loader2, CheckCircle, XCircle, Clock, AlertCircle, ExternalLink, Eye } from 'lucide-react'
+import { EnhancedResultViewer } from '@/components/enhanced-result-viewer'
+import { useTransactionHistory } from '@/hooks/use-transaction-history'
+import type { Address } from 'viem'
 
 /**
  * Component to check batch transaction result by ID
@@ -27,10 +31,13 @@ interface BatchCallResult {
 }
 
 export function BatchResultChecker() {
+  const { address } = useAccount()
+  const { history } = useTransactionHistory()
   const [batchId, setBatchId] = useState('')
   const [result, setResult] = useState<BatchCallResult | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [showEnhanced, setShowEnhanced] = useState(false)
 
   const checkBatchStatus = async () => {
     if (!batchId.trim()) {
@@ -143,8 +150,52 @@ export function BatchResultChecker() {
           </Alert>
         )}
 
-        {result && (
-          <div className="space-y-4">
+        {result && (() => {
+          const record = history.find(r => r.id === batchId)
+          
+          // Show enhanced viewer if available and toggled
+          if (record && showEnhanced) {
+            return (
+              <div className="space-y-4">
+                <div className="flex justify-end">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowEnhanced(false)}
+                  >
+                    Show Basic View
+                  </Button>
+                </div>
+                <EnhancedResultViewer
+                  batchId={record.id}
+                  status={record.status}
+                  chainId={record.chainId}
+                  calls={record.calls}
+                  receipts={record.receipts}
+                  error={record.error}
+                  timestamp={record.timestamp}
+                />
+              </div>
+            )
+          }
+          
+          // Show basic view with enhanced toggle button
+          return (
+            <div className="space-y-4">
+              {record && (
+                <div className="flex justify-end">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowEnhanced(true)}
+                    className="gap-2"
+                  >
+                    <Eye className="h-4 w-4" />
+                    Show Enhanced View
+                  </Button>
+                </div>
+              )}
+              
             {/* Status Summary */}
             <Alert>
               <div className="flex items-center gap-3">
@@ -240,7 +291,8 @@ export function BatchResultChecker() {
               </pre>
             </details>
           </div>
-        )}
+          )
+        })()}
 
         {/* Info */}
         <Alert>

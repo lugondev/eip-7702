@@ -5,16 +5,15 @@ import { useAccount } from 'wagmi'
 import { WalletConnect } from '@/components/wallet-connect'
 import { BatchTransactionV2 } from '@/components/batch-transaction-v2'
 import { BatchResultChecker } from '@/components/batch-result-checker'
+import { TransactionHistory } from '@/components/transaction-history'
 import { AccountInfo } from '@/components/account-info'
 import { NetworkStatus } from '@/components/network-status'
 import { DelegationStatus } from '@/components/delegation-status'
-import { Steps } from '@/components/delegation/steps'
-import { GatorProvider } from '@/components/providers/gator-provider'
-import { StepProvider } from '@/components/providers/step-provider'
+import { RevokeDelegationButton } from '@/components/delegation/revoke-delegation-button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Zap, Info, Workflow, ClipboardCheck } from 'lucide-react'
+import { Zap, Info, ClipboardCheck, History as HistoryIcon } from 'lucide-react'
 import type { Address } from 'viem'
 
 const STATELESS_DELEGATOR_ADDRESS = (
@@ -38,8 +37,8 @@ export function EIP7702Dashboard() {
           </p>
           <div className="flex justify-center gap-2">
             <Badge variant="secondary">EIP-7702</Badge>
-            <Badge variant="secondary">EIP-7710</Badge>
             <Badge variant="secondary">useSendCalls</Badge>
+            <Badge variant="secondary">Wagmi v2</Badge>
           </div>
         </div>
 
@@ -72,9 +71,9 @@ export function EIP7702Dashboard() {
                   <ClipboardCheck className="h-4 w-4 mr-2" />
                   Check Result
                 </TabsTrigger>
-                <TabsTrigger value="delegation">
-                  <Workflow className="h-4 w-4 mr-2" />
-                  Delegation (EIP-7710)
+                <TabsTrigger value="history">
+                  <HistoryIcon className="h-4 w-4 mr-2" />
+                  History
                 </TabsTrigger>
                 <TabsTrigger value="info">
                   <Info className="h-4 w-4 mr-2" />
@@ -84,8 +83,15 @@ export function EIP7702Dashboard() {
 
               <TabsContent value="batch" className="mt-6">
                 <div className="space-y-6">
-                  {/* Delegation Status */}
-                  <DelegationStatus implementationAddress={STATELESS_DELEGATOR_ADDRESS} />
+                  {/* Revoke Delegation */}
+                  <RevokeDelegationButton 
+                    implementationAddress={STATELESS_DELEGATOR_ADDRESS}
+                    showStatus={true}
+                    onSuccess={() => {
+                      // Refresh delegation status after revoke
+                      setTimeout(() => window.location.reload(), 2000)
+                    }}
+                  />
                   
                   {/* Batch Transaction Form */}
                   <Card>
@@ -106,46 +112,35 @@ export function EIP7702Dashboard() {
                 <BatchResultChecker />
               </TabsContent>
 
-              <TabsContent value="delegation" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Delegation Toolkit (EIP-7710)</CardTitle>
-                    <CardDescription>
-                      Create and manage delegations with MetaMask Smart Accounts
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <StepProvider>
-                      <GatorProvider>
-                        <Steps />
-                      </GatorProvider>
-                    </StepProvider>
-                  </CardContent>
-                </Card>
+              <TabsContent value="history" className="mt-6">
+                <TransactionHistory />
               </TabsContent>
 
               <TabsContent value="info" className="mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>About This Demo</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <h3 className="font-semibold mb-2">EIP-7702: Batch Transactions</h3>
-                      <p className="text-sm text-gray-600">
-                        Execute multiple transactions atomically using <code className="bg-gray-100 px-1 py-0.5 rounded">useSendCalls</code> from wagmi/experimental.
-                        MetaMask automatically handles EOA → Smart Account upgrade.
-                      </p>
-                    </div>
-                    <div>
-                      <h3 className="font-semibold mb-2">EIP-7710: Delegation Toolkit</h3>
-                      <p className="text-sm text-gray-600">
-                        Create and manage delegations using MetaMask Delegation Toolkit. Includes smart account deployment,
-                        delegation creation with caveats, and delegation redemption with sponsored gas (Pimlico).
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
+                <div className="space-y-6">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>About This Demo</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div>
+                        <h3 className="font-semibold mb-2">EIP-7702: Batch Transactions</h3>
+                        <p className="text-sm text-gray-600">
+                          Execute multiple transactions atomically using <code className="bg-gray-100 px-1 py-0.5 rounded">useSendCalls</code> from wagmi/experimental.
+                          MetaMask automatically handles EOA → Smart Account upgrade.
+                        </p>
+                        <p className="text-sm text-gray-600 mt-2">
+                          This demo showcases the power of EIP-7702 by allowing users to upgrade their Externally Owned Accounts (EOA) 
+                          to smart accounts temporarily, enabling advanced features like batch transactions, delegation, and sponsored gas.
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Import flow diagrams */}
+                  {/* <EIP7702FlowDiagram /> */}
+                  {/* <DelegationFlowDiagram /> */}
+                </div>
               </TabsContent>
             </Tabs>
           </>

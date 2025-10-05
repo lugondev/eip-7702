@@ -1,12 +1,12 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { useAccount, usePublicClient } from 'wagmi'
 import type { Address } from 'viem'
 
 /**
  * Hook to check if an EOA has been delegated to an implementation (EIP-7702)
- * Returns delegation status and functions to delegate/revoke
+ * Returns delegation status and functions to check/revoke delegation
  */
 export function useDelegationStatus(implementationAddress?: Address) {
   const { address, isConnected } = useAccount()
@@ -64,24 +64,6 @@ export function useDelegationStatus(implementationAddress?: Address) {
       setIsChecking(false)
     }
   }, [address, publicClient])
-
-  /**
-   * Delegate current EOA to implementation address
-   * This will be triggered by wallet_sendCalls automatically
-   */
-  const delegate = useCallback(async (targetImplementation: Address) => {
-    if (!window.ethereum || !address) {
-      throw new Error('Wallet not connected')
-    }
-
-    console.log('🔐 Delegating to:', targetImplementation)
-    
-    // The actual delegation happens when wallet_sendCalls is executed
-    // MetaMask will prompt user to delegate their EOA
-    // We just need to make a call that requires delegation
-    
-    return { success: true }
-  }, [address])
 
   /**
    * Revoke delegation by sending EIP-7702 authorization to 0x0
@@ -146,7 +128,6 @@ export function useDelegationStatus(implementationAddress?: Address) {
     
     // Actions
     checkDelegation,
-    delegate,
     revokeDelegation,
     
     // Helpers
