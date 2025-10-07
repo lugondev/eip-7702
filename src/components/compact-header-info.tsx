@@ -38,68 +38,68 @@ export function CompactHeaderInfo({ address, delegatorAddress, isDelegated }: Co
   }
 
   return (
-    <Card className="border-2">
-      <CardContent className="p-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <Card className="border">
+      <CardContent className="p-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {/* Account */}
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Wallet className="h-4 w-4 text-blue-600" />
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 bg-blue-100 rounded">
+              <Wallet className="h-3.5 w-3.5 text-blue-600" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs text-muted-foreground">Account</p>
-              <div className="flex items-center gap-1">
-                <p className="text-sm font-mono font-semibold">{formatAddress(address)}</p>
+              <p className="text-[10px] text-muted-foreground">Account</p>
+              <div className="flex items-center gap-0.5">
+                <p className="text-xs font-mono font-semibold">{formatAddress(address)}</p>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-5 w-5"
+                  className="h-4 w-4"
                   onClick={() => copyToClipboard(address)}
                 >
-                  {copiedAddress ? <Check className="h-3 w-3 text-green-600" /> : <Copy className="h-3 w-3" />}
+                  {copiedAddress ? <Check className="h-2.5 w-2.5 text-green-600" /> : <Copy className="h-2.5 w-2.5" />}
                 </Button>
               </div>
             </div>
           </div>
 
           {/* Balance */}
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <Fuel className="h-4 w-4 text-green-600" />
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 bg-green-100 rounded">
+              <Fuel className="h-3.5 w-3.5 text-green-600" />
             </div>
             <div className="flex-1">
-              <p className="text-xs text-muted-foreground">Balance</p>
-              <p className="text-sm font-semibold">{formatBalance(balance)} ETH</p>
+              <p className="text-[10px] text-muted-foreground">Balance</p>
+              <p className="text-xs font-semibold">{formatBalance(balance)} ETH</p>
             </div>
           </div>
 
           {/* Delegator */}
-          <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${isDelegated ? 'bg-purple-100' : 'bg-gray-100'}`}>
-              <Shield className={`h-4 w-4 ${isDelegated ? 'text-purple-600' : 'text-gray-400'}`} />
+          <div className="flex items-center gap-2">
+            <div className={`p-1.5 rounded ${isDelegated ? 'bg-purple-100' : 'bg-gray-100'}`}>
+              <Shield className={`h-3.5 w-3.5 ${isDelegated ? 'text-purple-600' : 'text-gray-400'}`} />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs text-muted-foreground">Delegator</p>
-              <div className="flex items-center gap-1">
-                <p className="text-sm font-mono font-semibold truncate">{formatAddress(delegatorAddress)}</p>
+              <p className="text-[10px] text-muted-foreground">Delegator</p>
+              <div className="flex items-center gap-0.5">
+                <p className="text-xs font-mono font-semibold truncate">{formatAddress(delegatorAddress)}</p>
                 {isDelegated && (
-                  <CheckCircle2 className="h-3 w-3 text-green-600 flex-shrink-0" />
+                  <CheckCircle2 className="h-2.5 w-2.5 text-green-600 flex-shrink-0" />
                 )}
               </div>
             </div>
           </div>
 
           {/* Network */}
-          <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${isSupported ? 'bg-indigo-100' : 'bg-red-100'}`}>
-              <Network className={`h-4 w-4 ${isSupported ? 'text-indigo-600' : 'text-red-600'}`} />
+          <div className="flex items-center gap-2">
+            <div className={`p-1.5 rounded ${isSupported ? 'bg-indigo-100' : 'bg-red-100'}`}>
+              <Network className={`h-3.5 w-3.5 ${isSupported ? 'text-indigo-600' : 'text-red-600'}`} />
             </div>
             <div className="flex-1">
-              <p className="text-xs text-muted-foreground">Network</p>
-              <div className="flex items-center gap-1">
-                <p className="text-sm font-semibold">{networkName}</p>
+              <p className="text-[10px] text-muted-foreground">Network</p>
+              <div className="flex items-center gap-0.5">
+                <p className="text-xs font-semibold">{networkName}</p>
                 {isSupported && (
-                  <Badge variant="outline" className="h-4 px-1 text-[10px]">
+                  <Badge variant="outline" className="h-3.5 px-1 text-[9px]">
                     Ready
                   </Badge>
                 )}

@@ -230,26 +230,24 @@ export function BatchTransactionEnhanced() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       {/* EIP-7702 Info */}
-      <Alert>
-        <Info className="h-4 w-4" />
-        <AlertDescription>
-          <strong>EIP-7702 Batch Transactions</strong>
-          <br />
-          Batch transactions will be executed via <code>wallet_sendCalls</code>. Requires MetaMask with EIP-7702 support.
+      <Alert className="py-2">
+        <Info className="h-3.5 w-3.5" />
+        <AlertDescription className="text-xs">
+          <strong>EIP-7702 Batch Transactions</strong> - Executed via <code className="text-xs">wallet_sendCalls</code>
         </AlertDescription>
       </Alert>
 
       {/* Input Mode Selection */}
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center justify-between text-sm">
             <span>Input Mode</span>
-            <Badge variant="outline">{inputMode}</Badge>
+            <Badge variant="outline" className="text-xs">{inputMode}</Badge>
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-2">
           <Tabs value={inputMode} onValueChange={(v) => setInputMode(v as InputMode)}>
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="manual">
@@ -284,50 +282,52 @@ export function BatchTransactionEnhanced() {
       </Card>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-2">
         {calls.map((call, index) => (
           <Card key={index}>
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-2">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">Call {index + 1}</CardTitle>
+                <CardTitle className="text-sm">Call {index + 1}</CardTitle>
                 {calls.length > 1 && (
                   <Button 
                     type="button" 
                     variant="outline" 
                     size="sm"
+                    className="h-7 px-2"
                     onClick={() => removeCall(index)}
                   >
-                    <Minus className="h-4 w-4" />
+                    <Minus className="h-3 w-3" />
                   </Button>
                 )}
               </div>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-2 pt-0">
               <div>
-                <Label htmlFor={`to-${index}`}>To Address</Label>
+                <Label htmlFor={`to-${index}`} className="text-xs">To Address</Label>
                 <Input
                   id={`to-${index}`}
                   type="text"
                   placeholder="0x..."
                   value={call.to}
                   onChange={(e) => updateCall(index, 'to', e.target.value)}
-                  className="font-mono text-sm"
+                  className="font-mono text-xs h-8"
                 />
               </div>
               
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <Label htmlFor={`value-${index}`}>
+                <div className="flex items-center justify-between mb-1">
+                  <Label htmlFor={`value-${index}`} className="text-xs">
                     Value ({call.unit.toUpperCase()})
                   </Label>
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
+                    className="h-6 px-2"
                     onClick={() => toggleCallUnit(index)}
                   >
-                    <ArrowLeftRight className="h-3 w-3 mr-1" />
-                    Switch to {call.unit === 'eth' ? 'Wei' : 'ETH'}
+                    <ArrowLeftRight className="h-2.5 w-2.5 mr-1" />
+                    <span className="text-[10px]">Switch to {call.unit === 'eth' ? 'Wei' : 'ETH'}</span>
                   </Button>
                 </div>
                 <Input
@@ -336,10 +336,11 @@ export function BatchTransactionEnhanced() {
                   placeholder={call.unit === 'eth' ? '0.0' : '0'}
                   value={call.value}
                   onChange={(e) => updateCall(index, 'value', e.target.value)}
+                  className="h-8"
                 />
                 {call.value && call.value !== '0' && (
-                  <div className="mt-1 px-2 py-1 bg-muted rounded-md">
-                    <p className="text-xs text-muted-foreground">
+                  <div className="mt-1 px-1.5 py-0.5 bg-muted rounded">
+                    <p className="text-[10px] text-muted-foreground">
                       {call.unit === 'eth' ? (
                         <>
                           ≈ <span className="font-mono">{(() => {
@@ -367,8 +368,8 @@ export function BatchTransactionEnhanced() {
               </div>
               
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <Label htmlFor={`data-${index}`}>Call Data (optional)</Label>
+                <div className="flex items-center justify-between mb-1">
+                  <Label htmlFor={`data-${index}`} className="text-xs">Call Data (optional)</Label>
                   <ABIEncoderModal onGenerate={(data) => updateCall(index, 'data', data)} />
                 </div>
                 <Input
@@ -377,34 +378,36 @@ export function BatchTransactionEnhanced() {
                   placeholder="0x"
                   value={call.data}
                   onChange={(e) => updateCall(index, 'data', e.target.value)}
-                  className="font-mono text-sm"
+                  className="font-mono text-xs h-8"
                 />
               </div>
             </CardContent>
           </Card>
         ))}
 
-        <div className="flex gap-2">
-          <Button type="button" variant="outline" onClick={addCall}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Call
+        <div className="flex gap-1.5">
+          <Button type="button" variant="outline" onClick={addCall} size="sm" className="h-8">
+            <Plus className="h-3 w-3 mr-1" />
+            <span className="text-xs">Add</span>
           </Button>
 
           <Button 
             type="button" 
             variant="outline"
+            size="sm"
+            className="h-8"
             onClick={handleEstimate}
             disabled={isEstimating || !isConnected}
           >
             {isEstimating ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Estimating...
+                <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                <span className="text-xs">Estimating...</span>
               </>
             ) : (
               <>
-                <Fuel className="h-4 w-4 mr-2" />
-                Estimate Gas
+                <Fuel className="h-3 w-3 mr-1" />
+                <span className="text-xs">Estimate</span>
               </>
             )}
           </Button>
@@ -412,17 +415,18 @@ export function BatchTransactionEnhanced() {
           <Button 
             type="submit" 
             disabled={isLoading || !isConnected} 
-            className="flex-1"
+            size="sm"
+            className="flex-1 h-8"
           >
             {isLoading ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Sending...
+                <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                <span className="text-xs">Sending...</span>
               </>
             ) : (
               <>
-                <Send className="h-4 w-4 mr-2" />
-                Execute Batch ({calls.filter(c => c.to).length} calls)
+                <Send className="h-3 w-3 mr-1" />
+                <span className="text-xs">Execute ({calls.filter(c => c.to).length})</span>
               </>
             )}
           </Button>

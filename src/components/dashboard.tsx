@@ -27,19 +27,19 @@ export function EIP7702Dashboard() {
   const { isDelegated } = useDelegationStatus(STATELESS_DELEGATOR_ADDRESS)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-3">
+      <div className="max-w-5xl mx-auto">
+        <div className="text-center mb-4">
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">
             EIP-7702 Batch Transactions
           </h1>
-          <p className="text-lg text-gray-600 mb-4">
+          <p className="text-sm text-gray-600 mb-2">
             Execute multiple transactions atomically
           </p>
-          <div className="flex justify-center gap-2">
-            <Badge variant="secondary">EIP-7702</Badge>
-            <Badge variant="secondary">useSendCalls</Badge>
-            <Badge variant="secondary">Wagmi v2</Badge>
+          <div className="flex justify-center gap-1.5">
+            <Badge variant="secondary" className="text-xs py-0">EIP-7702</Badge>
+            <Badge variant="secondary" className="text-xs py-0">useSendCalls</Badge>
+            <Badge variant="secondary" className="text-xs py-0">Wagmi v2</Badge>
           </div>
         </div>
 
@@ -50,12 +50,12 @@ export function EIP7702Dashboard() {
         ) : (
           <>
             {/* Unsupported Network Alert */}
-            <div className="mb-6">
+            <div className="mb-3">
               <UnsupportedNetworkAlert />
             </div>
             
             {/* Compact Header Info */}
-            <div className="mb-6">
+            <div className="mb-3">
               <CompactHeaderInfo 
                 address={address!}
                 delegatorAddress={STATELESS_DELEGATOR_ADDRESS}
@@ -83,8 +83,8 @@ export function EIP7702Dashboard() {
                 </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="batch" className="mt-6">
-                <div className="space-y-6">
+              <TabsContent value="batch" className="mt-3">
+                <div className="space-y-3">
                   {/* Revoke Delegation */}
                   <RevokeDelegationButton 
                     implementationAddress={STATELESS_DELEGATOR_ADDRESS}
@@ -97,32 +97,32 @@ export function EIP7702Dashboard() {
                   
                   {/* Enhanced Batch Transaction Form with Template/Manual/API + ETH/Wei */}
                   <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Zap className="h-5 w-5" />
-                        Batch Transactions (EIP-7702)
+                    <CardHeader className="pb-3">
+                      <CardTitle className="flex items-center gap-2 text-base">
+                        <Zap className="h-4 w-4" />
+                        Batch Transactions
                       </CardTitle>
-                      <CardDescription>
-                        Execute multiple transactions atomically with Template/Manual/API modes and ETH ↔ Wei conversion
+                      <CardDescription className="text-xs">
+                        Execute multiple transactions atomically
                       </CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="pt-0">
                       <BatchTransactionEnhanced />
                     </CardContent>
                   </Card>
                 </div>
               </TabsContent>
 
-              <TabsContent value="check" className="mt-6">
+              <TabsContent value="check" className="mt-3">
                 <BatchResultChecker />
               </TabsContent>
 
-              <TabsContent value="history" className="mt-6">
+              <TabsContent value="history" className="mt-3">
                 <TransactionHistory />
               </TabsContent>
 
-              <TabsContent value="info" className="mt-6">
-                <div className="space-y-6">
+              <TabsContent value="info" className="mt-3">
+                <div className="space-y-3">
                   <Card>
                     <CardHeader>
                       <CardTitle>About This Demo</CardTitle>
@@ -150,6 +150,13 @@ export function EIP7702Dashboard() {
             </Tabs>
           </>
         )}
+
+        {/* Footer */}
+        <footer className="mt-6 pt-4 border-t text-center">
+          <p className="text-xs text-gray-500">
+            EIP-7702 Demo • Built with Wagmi v2 & Next.js • Made with ❤️ by LugonDev • {new Date().getFullYear()}
+          </p>
+        </footer>
       </div>
     </div>
   )
