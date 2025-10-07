@@ -3,13 +3,13 @@
 import { useState } from 'react'
 import { useAccount } from 'wagmi'
 import { WalletConnect } from '@/components/wallet-connect'
-import { BatchTransactionV2 } from '@/components/batch-transaction-v2'
+import { BatchTransactionEnhanced } from '@/components/batch-transaction-enhanced'
 import { BatchResultChecker } from '@/components/batch-result-checker'
 import { TransactionHistory } from '@/components/transaction-history'
-import { AccountInfo } from '@/components/account-info'
-import { NetworkStatus } from '@/components/network-status'
-import { DelegationStatus } from '@/components/delegation-status'
+import { CompactHeaderInfo } from '@/components/compact-header-info'
 import { RevokeDelegationButton } from '@/components/delegation/revoke-delegation-button'
+import { UnsupportedNetworkAlert } from '@/components/ui/unsupported-network-alert'
+import { useDelegationStatus } from '@/hooks/use-delegation-status'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -24,6 +24,7 @@ const STATELESS_DELEGATOR_ADDRESS = (
 export function EIP7702Dashboard() {
   const { address, isConnected } = useAccount()
   const [activeTab, setActiveTab] = useState('batch')
+  const { isDelegated } = useDelegationStatus(STATELESS_DELEGATOR_ADDRESS)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
@@ -45,20 +46,21 @@ export function EIP7702Dashboard() {
         {!isConnected ? (
           <div className="max-w-md mx-auto space-y-4">
             <WalletConnect />
-            <NetworkStatus />
           </div>
         ) : (
           <>
-            <div className="mb-6 grid gap-4 md:grid-cols-4">
-              <div className="md:col-span-3">
-                <AccountInfo 
-                  address={address!}
-                  implementationAddress={STATELESS_DELEGATOR_ADDRESS}
-                />
-              </div>
-              <div>
-                <NetworkStatus />
-              </div>
+            {/* Unsupported Network Alert */}
+            <div className="mb-6">
+              <UnsupportedNetworkAlert />
+            </div>
+            
+            {/* Compact Header Info */}
+            <div className="mb-6">
+              <CompactHeaderInfo 
+                address={address!}
+                delegatorAddress={STATELESS_DELEGATOR_ADDRESS}
+                isDelegated={isDelegated || false}
+              />
             </div>
 
             <Tabs value={activeTab} onValueChange={setActiveTab}>
@@ -93,16 +95,19 @@ export function EIP7702Dashboard() {
                     }}
                   />
                   
-                  {/* Batch Transaction Form */}
+                  {/* Enhanced Batch Transaction Form with Template/Manual/API + ETH/Wei */}
                   <Card>
                     <CardHeader>
-                      <CardTitle>Batch Transactions (EIP-7702)</CardTitle>
+                      <CardTitle className="flex items-center gap-2">
+                        <Zap className="h-5 w-5" />
+                        Batch Transactions (EIP-7702)
+                      </CardTitle>
                       <CardDescription>
-                        Execute multiple transactions atomically using useSendCalls
+                        Execute multiple transactions atomically with Template/Manual/API modes and ETH ↔ Wei conversion
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <BatchTransactionV2 />
+                      <BatchTransactionEnhanced />
                     </CardContent>
                   </Card>
                 </div>

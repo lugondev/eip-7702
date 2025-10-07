@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Wallet, LogOut, Network, AlertTriangle } from 'lucide-react'
+import { isSupportedChain, getChainName } from '@/lib/supported-chains'
 
 export function WalletConnect() {
   const { connectors, connect, isPending } = useConnect()
@@ -15,7 +16,9 @@ export function WalletConnect() {
   const { switchChain, isPending: isSwitchingChain } = useSwitchChain()
   const chainId = useChainId()
 
+  const isSupported = isSupportedChain(chainId)
   const isWrongNetwork = isConnected && chainId !== sepolia.id
+  const networkName = getChainName(chainId)
 
   const handleSwitchToSepolia = () => {
     switchChain({ chainId: sepolia.id })
@@ -38,8 +41,8 @@ export function WalletConnect() {
             <div className="flex items-center gap-2">
               <Network className="h-4 w-4" />
               <span className="text-sm">Network:</span>
-              <Badge variant={isWrongNetwork ? "destructive" : "default"}>
-                {chain?.name || 'Unknown'}
+              <Badge variant={!isSupported || isWrongNetwork ? "destructive" : "default"}>
+                {networkName}
               </Badge>
             </div>
             
@@ -67,7 +70,16 @@ export function WalletConnect() {
           </CardContent>
         </Card>
         
-        {isWrongNetwork && (
+        {!isSupported && (
+          <Alert variant="destructive">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertDescription>
+              This network is not supported. Please switch to a supported network.
+            </AlertDescription>
+          </Alert>
+        )}
+        
+        {isSupported && isWrongNetwork && (
           <Alert variant="destructive">
             <AlertTriangle className="h-4 w-4" />
             <AlertDescription>

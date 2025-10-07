@@ -252,6 +252,20 @@ function execute(Execution calldata _execution) external payable;
 - **Tailwind CSS** + Radix UI for styling
 - **shadcn/ui** for component library
 
+### Supported Networks
+- ✅ **Ethereum Mainnet** (Chain ID: 1)
+- ✅ **BNB Smart Chain** (Chain ID: 56)
+- ✅ **BNB Smart Chain Testnet** (Chain ID: 97)
+- ✅ **Mega Testnet** (Chain ID: 10008)
+- ✅ **Base Mainnet** (Chain ID: 8453)
+- ✅ **Arbitrum One** (Chain ID: 42161)
+- ✅ **Sepolia Testnet** (Chain ID: 11155111)
+
+### Wallet Connection
+- 🦊 **MetaMask Only** - Optimized for MetaMask wallet
+- No WalletConnect or other connectors
+- MetaMask automatically handles EIP-7702 authorization
+
 ### Main Pages
 
 - **[Home /](/)**: Interactive demo with batch transactions and delegation

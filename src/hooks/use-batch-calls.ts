@@ -52,10 +52,6 @@ export function useBatchCalls() {
       throw new Error('Chain ID not available')
     }
 
-    if (chainId !== sepolia.id) {
-      throw new Error('Please switch to Sepolia network')
-    }
-
     if (calls.length === 0) {
       throw new Error('No calls to execute')
     }

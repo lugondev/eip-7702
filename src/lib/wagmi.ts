@@ -1,31 +1,37 @@
 import { http, createConfig } from 'wagmi'
-import { mainnet, sepolia, base, hardhat } from 'wagmi/chains'
-import { injected, metaMask, coinbaseWallet } from 'wagmi/connectors'
+import { metaMask } from 'wagmi/connectors'
+import { supportedChains, megaTestnet } from './supported-chains'
+import { mainnet, bsc, bscTestnet, base, arbitrum, sepolia } from 'wagmi/chains'
 
 /**
  * Wagmi configuration for EIP-7702 support
- * Includes: Mainnet, Sepolia, Base, and local Hardhat
+ * Supported networks:
+ * - Ethereum Mainnet
+ * - BNB Smart Chain
+ * - BNB Smart Chain Testnet
+ * - Mega Testnet
+ * - Base Mainnet
+ * - Arbitrum One
+ * - Sepolia
  * 
- * Base chain added for future support
- * Sepolia is primary testnet for EIP-7702 (Pectra upgrade)
+ * Only MetaMask connector is enabled
  */
 export const config = createConfig({
-  chains: [mainnet, sepolia, base, hardhat],
+  chains: supportedChains as any,
   connectors: [
-    injected(),
     metaMask({
       dappMetadata: {
         name: "EIP-7702 Tool",
       },
     }),
-    coinbaseWallet({
-      appName: "EIP-7702 Tool",
-    }),
   ],
   transports: {
     [mainnet.id]: http(process.env.NEXT_PUBLIC_MAINNET_RPC_URL),
-    [sepolia.id]: http(process.env.NEXT_PUBLIC_SEPOLIA_RPC_URL),
+    [bsc.id]: http(process.env.NEXT_PUBLIC_BSC_RPC_URL || 'https://bsc-dataseed.binance.org'),
+    [bscTestnet.id]: http(process.env.NEXT_PUBLIC_BSC_TESTNET_RPC_URL || 'https://data-seed-prebsc-1-s1.binance.org:8545'),
+    [megaTestnet.id]: http(process.env.NEXT_PUBLIC_MEGA_TESTNET_RPC_URL || 'https://testnet-rpc.mega.io'),
     [base.id]: http(process.env.NEXT_PUBLIC_BASE_RPC_URL),
-    [hardhat.id]: http('http://127.0.0.1:8545'),
+    [arbitrum.id]: http(process.env.NEXT_PUBLIC_ARBITRUM_RPC_URL || 'https://arb1.arbitrum.io/rpc'),
+    [sepolia.id]: http(process.env.NEXT_PUBLIC_SEPOLIA_RPC_URL),
   },
 })
