@@ -69,3 +69,20 @@ export function getChainName(chainId: number): string {
 export function getSupportedChainIds(): number[] {
   return Object.keys(chainIdToName).map(Number)
 }
+
+/**
+ * Get block explorer URL for an address on a specific chain
+ */
+export function getExplorerUrl(chainId: number, address: string): string | null {
+  const chain = supportedChains.find((c) => c.id === chainId)
+  if (!chain?.blockExplorers?.default?.url) return null
+  return `${chain.blockExplorers.default.url}/address/${address}`
+}
+
+/**
+ * Get block explorer name for a specific chain
+ */
+export function getExplorerName(chainId: number): string | null {
+  const chain = supportedChains.find((c) => c.id === chainId)
+  return chain?.blockExplorers?.default?.name || null
+}
