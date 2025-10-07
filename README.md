@@ -1,46 +1,32 @@
-# EIP-7702 & EIP-7710 Demo
+# EIP-7702 Batch Transactions Demo
 
-A comprehensive demo implementing **two modern approaches** for EOA account abstraction:
+A modern demo implementing **EIP-7702** for EOA account abstraction using **wagmi/experimental** `useSendCalls`:
 
-## 🚀 Implementations
-
-### 1. EIP-7702: Batch Transactions (useSendCalls)
-
-Simple approach using **wagmi/experimental** `useSendCalls`:
+## 🚀 Features
 
 - 🚀 **Zero Setup**: No smart account deployment needed
 - 🦊 **MetaMask Integration**: Auto-prompts to upgrade EOA to smart account
 - ⚡ **Atomic Execution**: All transactions succeed or all fail
 - 📦 **ERC-5792 Compliant**: Using `wallet_sendCalls` standard
-- ✅ **5 lines of code** to execute batch transactions
+- 🎯 **Preset Templates**: 8 ready-to-use templates for common use cases
+- ⛽ **Gas Estimation**: Compare batch vs sequential gas costs
+- � **Transaction History**: Auto-save and track all batch transactions
+- 🔍 **Enhanced Result Viewer**: Decode 50+ common function signatures
+- 🔐 **Revoke Delegation**: Reset account to normal EOA anytime
 
 👉 **Perfect for**: Simple batch transactions, quick demos, minimal complexity
-
-### 2. EIP-7710: Delegation Toolkit (Full Framework)
-
-Powerful approach using **@metamask/delegation-toolkit**:
-
-- 🎯 **Full Delegation Framework**: Create, sign, and redeem delegations
-- 🔐 **Caveats System**: 40+ restriction types (time, amount, targets, etc.)
-- 💰 **Sponsored Gas**: Pimlico Paymaster integration
-- 🤖 **Advanced Automation**: Perfect for bots, recurring payments, DeFi automation
-- 📋 **5-Step Wizard**: Guided workflow from wallet connection to redemption
-- 🏗️ **Smart Account Deployment**: Full control over smart accounts
-
-👉 **Perfect for**: DeFi automation, social recovery, recurring payments, bot trading
 
 ## 📚 Documentation
 
 ### 📖 In-App Documentation
 - **[/docs](http://localhost:3000/docs)** - Complete EIP-7702 specification, motivation, and technical details
 - **[/reference](http://localhost:3000/reference)** - Code examples, tutorials, and best practices
-- **[Demo](http://localhost:3000)** - Live interactive demo with batch transactions and delegation
+- **[Demo](http://localhost:3000)** - Live interactive demo with batch transactions
 
 ### 📝 Project Guides
 - [EIP-7702 Implementation Guide](.docs/wagmi-viem-implementation.md)
-- [EIP-7710 Delegation Toolkit Guide](.docs/delegation-toolkit-implementation.md)
 - [Comparison V1 vs V2](.docs/comparison-v1-vs-v2.md)
-- **[Revoke Delegation Guide](.docs/revoke-delegation-guide.md)** ← NEW! Complete guide with 4 methods
+- [Revoke Delegation Guide](.docs/revoke-delegation-guide.md) - Complete guide with 4 methods
 - [Revoke Implementation](.docs/REVOKE_IMPLEMENTATION.md) - Quick start & API reference
 - [Revoke Examples](.docs/revoke-examples.tsx) - Copy-paste code snippets
 
@@ -48,19 +34,14 @@ Powerful approach using **@metamask/delegation-toolkit**:
 
 ### 🎯 Core Features
 - 🔐 **Authorization Signing**: Sign authorization to delegate EOA to smart contract
-- ⚡ **Batch Transactions V2** (NEW): Modern approach with `useSendCalls` - MetaMask automatically handles authorization
-- ⚡ **Batch Transactions V1**: Manual authorization flow for advanced use cases
+- ⚡ **Batch Transactions**: Modern approach with `useSendCalls` - MetaMask automatically handles authorization
 - 🔑 **Session Keys**: Manage session keys with expiration
-- 💰 **Paymaster Integration**: Support for sponsored gas fees
-- 👥 **Operator Management**: Manage operator permissions for accounts
 - 📊 **Monitoring**: Track delegation status and activities
 
 ### 📚 NEW Features (Phase 1 - October 2025)
 - 🔐 **Revoke Delegation**: Reset account to normal EOA - clear delegation anytime
-  - Full UI component with status display
-  - Multiple revoke methods (Component, Hook, Viem)
-  - Manual guide modal for troubleshooting
-  - Auto-refresh after revoke
+  - UI component with status display in Info tab
+  - Multiple revoke methods (Hook, Viem)
   - Complete documentation with examples
 - ⛽ **Gas Estimation**: See gas costs before submitting - compare batch vs sequential
 - 🎯 **Preset Templates**: 8 ready-to-use templates for common use cases (DeFi, NFT, Transfers)
@@ -116,24 +97,33 @@ eip-7702/
 │   │   │   └── page.tsx          # EIP-7702 specification
 │   │   ├── reference/            # Code reference pages
 │   │   │   └── page.tsx          # Examples & tutorials
-│   │   ├── layout.tsx            # Root layout with navigation
+│   │   ├── layout.tsx            # Root layout
 │   │   └── globals.css           # Global styles
 │   ├── components/               # React components
-│   │   ├── dashboard.tsx         # Main dashboard with tabs
-│   │   ├── navigation.tsx        # App navigation bar
-│   │   ├── batch-transaction-v2.tsx  # Batch transaction form
-│   │   ├── eip7702-flow-diagram.tsx  # Visual flow diagram
-│   │   ├── delegation-flow-diagram.tsx  # Delegation flow
+│   │   ├── dashboard.tsx         # Main dashboard with 4 tabs
+│   │   ├── batch-transaction-enhanced.tsx  # Batch transaction with templates
+│   │   ├── batch-result-checker.tsx  # Check batch results
+│   │   ├── transaction-history.tsx   # Transaction history viewer
+│   │   ├── enhanced-result-viewer.tsx # Transaction decoder
+│   │   ├── gas-estimation-display.tsx # Gas estimation
+│   │   ├── compact-header-info.tsx   # Account info header
 │   │   ├── delegation/           # Delegation components
+│   │   │   ├── revoke-delegation-button.tsx
+│   │   │   └── steps.tsx
 │   │   ├── providers/            # Context providers
 │   │   └── ui/                   # UI components (shadcn)
 │   ├── hooks/                    # Custom React hooks
 │   │   ├── use-batch-calls.ts    # Batch transaction logic
-│   │   ├── use-delegation-status.ts
-│   │   └── use-pimlico-utils.ts  # Paymaster integration
+│   │   ├── use-delegation-status.ts  # Check delegation status
+│   │   ├── use-revoke-delegation.ts  # Revoke delegation
+│   │   ├── use-gas-estimation.ts     # Gas estimation
+│   │   └── use-transaction-history.ts # Transaction history
 │   ├── lib/                      # Utilities & config
 │   │   ├── wagmi.ts             # Wagmi configuration
 │   │   ├── utils.ts             # Helper functions
+│   │   ├── batch-templates.ts   # Preset templates
+│   │   ├── transaction-decoder.ts # Function decoder
+│   │   ├── supported-chains.ts  # Chain configurations
 │   │   └── abis/                # Contract ABIs
 │   └── types/                    # TypeScript types
 └── README.md
@@ -184,38 +174,34 @@ pnpm dev
 2. Connect MetaMask wallet
 3. Switch to **Sepolia testnet**
 4. Get test ETH from [Sepolia Faucet](https://sepoliafaucet.com/)
-5. Go to **"Batch (EIP-7702)"** tab
-6. Click **"Execute Batch"**
-7. MetaMask prompts: **"Upgrade to Smart Account?"** → Approve
-8. All transactions execute atomically! 🎉
-9. Check result on Etherscan
+5. Go to **"Batch Transactions"** tab
+6. Choose a template or create custom transactions
+7. Review gas estimation
+8. Click **"Execute Batch"**
+9. MetaMask prompts: **"Upgrade to Smart Account?"** → Approve
+10. All transactions execute atomically! 🎉
+11. Check result in **"Check Result"** tab or on Etherscan
 
 **That's it! No manual authorization needed - MetaMask handles everything!**
 
-### 5. Test EIP-7710 Delegation Toolkit
+### 5. View Transaction History
 
-1. Go to **"Delegation (EIP-7710)"** tab
-2. Add **Pimlico API key** to `.env.local` (get free key: https://www.pimlico.io/)
-3. **Step 1**: Wallet already connected ✅
-4. **Step 2**: Click **"Deploy Delegator"** → Deploy your smart account (gas sponsored!)
-5. **Step 3**: Click **"Create Delegate"** → Generate delegate account locally
-6. **Step 4**: Click **"Create Delegation"** → Sign delegation with caveats
-7. **Step 5**: Click **"Redeem Delegation"** → Execute transaction on behalf of delegator
-8. View transaction on Etherscan! 🎉
+1. Go to **"Transaction History"** tab
+2. View all past batch transactions
+3. Search and filter by status or date
+4. Click on any transaction to see decoded details
+5. Export/Import history as JSON
 
-**Advanced**: Delegation stored in localStorage, gas sponsored by Pimlico Paymaster!
+### 6. Check Account Info & Revoke Delegation
 
-### 6. Test Revoke Delegation
-
-1. Go to **"/revoke"** page or click **"Revoke Delegation"** in dashboard
-2. **Check Status**: View current delegation status
-3. Click **"Revoke Delegation"** button
-4. Confirm transaction in MetaMask
-5. Wait for confirmation (~2-3 seconds)
+1. Go to **"Info"** tab
+2. View current delegation status
+3. See delegated contract address (if delegated)
+4. Click **"Revoke Delegation"** to reset to normal EOA
+5. Confirm transaction in MetaMask
 6. Account reverted to normal EOA! 🎉
 
 **Alternative Methods:**
-- Use component: `<RevokeDelegationButton />`
 - Use hook: `const { revokeDelegation } = useRevokeDelegation()`
 - MetaMask UI: Account Details → Switch to EOA
 - See full guide: [.docs/revoke-delegation-guide.md](.docs/revoke-delegation-guide.md)
@@ -268,54 +254,62 @@ function execute(Execution calldata _execution) external payable;
 
 ### Main Pages
 
-- **[Home /](/)**: Interactive demo with batch transactions and delegation
-- **[Revoke /revoke](/revoke)**: ← NEW! Revoke delegation page with full UI
+- **[Home /](/)**: Interactive demo with batch transactions
 - **[Docs /docs](/docs)**: Complete EIP-7702 specification and guides
 - **[Reference /reference](/reference)**: Code examples, tutorials, and best practices
 
 ### Main Components
 
-- **Dashboard**: Main interface with 4 tabs (Batch, Check Result, Delegation, Info)
-- **Navigation**: App-wide navigation bar with Demo, Docs, Reference links
-- **RevokeDelegationButton**: ← NEW! Full UI component for revoking delegation
-  - Status display with delegated address
-  - Revoke button with loading states
-  - Manual guide modal
-  - Success/Error messages
-  - Etherscan links
-- **EIP7702FlowDiagram**: Visual guide showing the EIP-7702 transaction flow
-- **DelegationFlowDiagram**: Step-by-step visualization of EIP-7710 delegation process
-- **BatchTransactionV2**: 
+- **Dashboard**: Main interface with 4 tabs (Batch Transactions, Check Result, Transaction History, Info)
+- **BatchTransactionEnhanced**: 
   - Create multiple transaction calls
+  - 8 preset templates for common use cases
+  - Gas estimation before execution
   - Auto sign authorization + encode + send
   - Atomic execution (all or nothing)
   - Uses `useSendCalls` hook (ERC-5792)
 - **BatchResultChecker**: Check status and results of batch transactions
-- **Steps** (Delegation): 5-step wizard for delegation workflow
+- **TransactionHistory**: 
+  - View all past transactions
+  - Search and filter capabilities
+  - Export/Import as JSON
+  - Statistics dashboard
+- **EnhancedResultViewer**: 
+  - Decode 50+ common function signatures
+  - Transaction details with gas usage
+  - Visual timeline of execution
+  - Etherscan integration
+- **RevokeDelegationButton**: Component for revoking delegation
+  - Status display with delegated address
+  - Revoke button with loading states
+  - Success/Error messages
+  - Etherscan links
+- **CompactHeaderInfo**: Display address, balance, network info
 - **WalletConnect**: MetaMask connection with network detection
-- **AccountInfo**: Display address, balance, delegation status
 
 ### Hooks
 
-- **useRevokeDelegation**: ← NEW! Revoke delegation logic
-  - Multiple revoke methods (MetaMask, Viem, Contract)
+- **useBatchCalls**: Main hook for batch transactions
+  - Uses wagmi's `useSendCalls` (ERC-5792)
+  - Automatic authorization handling
+  - Transaction status tracking
+- **useRevokeDelegation**: Revoke delegation logic
+  - Multiple revoke methods (Viem, Contract)
   - Delegation status checking
   - Error handling with helpful messages
   - Transaction tracking
-- **useDelegationStatus**: ← NEW! Check delegation state
+- **useDelegationStatus**: Check delegation state
   - Check if account is delegated
   - Get delegated contract address
   - Auto-refresh capabilities
-- **useEIP7702Authorization**: 
-  - Sign authorization following MetaMask Toolkit pattern
-  - Browser wallet compatible (personal_sign)
-  - Parse signature to (r, s, yParity)
-- **useEIP7702Transaction**: 
-  - Send type 0x04 transactions
-  - Include authorizationList
-  - Wait for confirmation
-- **useEIP7702Contract**: Interact with implementation contract
-- **useEIP7702ContractRead**: Read contract state
+- **useGasEstimation**: Estimate gas costs
+  - Compare batch vs sequential execution
+  - Calculate gas savings
+  - Display estimated costs
+- **useTransactionHistory**: Manage transaction history
+  - Auto-save transactions to localStorage
+  - Search and filter capabilities
+  - Export/Import as JSON
 
 ### Key Features
 
@@ -336,49 +330,23 @@ function execute(Execution calldata _execution) external payable;
 # Install all dependencies
 pnpm install
 
-# Development - run all services
+# Development server
 pnpm dev
 
-# Build all packages
+# Build for production
 pnpm build
 
-# Run tests
-pnpm test
+# Start production server
+pnpm start
 
 # Lint code
 pnpm lint
 
+# Type check
+pnpm type-check
+
 # Clean build artifacts
 pnpm clean
-```
-
-### Contract-specific commands
-
-```bash
-# Compile contracts
-pnpm contracts:build
-
-# Run contract tests
-pnpm contracts:test
-
-# Deploy to localhost
-pnpm contracts:deploy
-
-# Deploy to sepolia
-pnpm contracts:deploy --network sepolia
-```
-
-### Frontend-specific commands
-
-```bash
-# Start development server
-pnpm frontend:dev
-
-# Build for production
-pnpm frontend:build
-
-# Type check
-pnpm frontend:type-check
 ```
 
 ## Deployment
@@ -445,103 +413,70 @@ pnpm start
 pm2 start pnpm --name "eip-7702" -- start
 ```
 
-### Testnet Deployment (Contracts Only)
+### Production Considerations
 
-1. Configure `.env` with RPC URLs and private keys
-2. Deploy contracts: `pnpm contracts:deploy --network sepolia`
-3. Update contract addresses in frontend
-4. Build frontend: `pnpm build`
-
-### Mainnet Deployment (Contracts Only)
-
-1. Audit contracts thoroughly
-2. Test on testnet first
-3. Configure production environment
-4. Deploy with proper gas settings
-5. Verify contracts on Etherscan
-
-## Testing
-
-### Unit Tests
-
-```bash
-# Test contracts
-pnpm contracts:test
-
-# Test with coverage
-pnpm contracts:test --coverage
-
-# Test specific file
-pnpm contracts:test test/EIP7702Implementation.test.ts
-```
-
-### Integration Tests
-
-```bash
-# Test full flow with local node
-pnpm contracts:dev
-pnpm contracts:deploy
-# Test frontend with deployed contracts
-```
+1. Ensure all environment variables are set
+2. Test thoroughly on Sepolia testnet first
+3. Monitor gas costs and transaction success rates
+4. Set up error tracking (e.g., Sentry)
+5. Configure proper CORS and security headers
 
 ## Security Considerations
 
-### Smart Contract Security
-
-- ✅ ReentrancyGuard for external calls
-- ✅ Access control for sensitive functions  
-- ✅ Input validation and sanity checks
-- ✅ Gas limits to avoid DoS
-- ✅ Proper nonce management
-- ✅ Emergency pause functionality
-
 ### Frontend Security
 
-- ✅ Signature verification
 - ✅ Transaction confirmation UIs
-- ✅ Rate limiting for API calls
-- ✅ Input sanitization
-- ✅ Secure key management prompts
+- ✅ Input sanitization and validation
+- ✅ Secure signature handling
+- ✅ Clear user prompts for all actions
+- ✅ Network validation before transactions
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. **Contract deployment fails**
-   - Check RPC URL and network configuration
-   - Ensure sufficient ETH for deployment
-   - Verify compiler version compatibility
+1. **MetaMask not prompting for authorization**
+   - Ensure you're on a supported network (Sepolia recommended)
+   - Update MetaMask to latest version
+   - Try refreshing the page and reconnecting wallet
 
-2. **Frontend connection issues**
-   - Check wallet connection
-   - Verify network matches contract deployment
-   - Check contract addresses configuration
+2. **Batch transaction fails**
+   - Check gas limits and balances
+   - Verify all transaction calls are valid
+   - Review error messages in Check Result tab
 
-3. **Transaction failures**
-   - Check gas limits
-   - Verify authorization signatures
-   - Ensure sufficient balances
+3. **Cannot revoke delegation**
+   - Ensure account is actually delegated (check Info tab)
+   - Try different revoke methods (see revoke guide)
+   - Check network connection and gas balance
 
-### Debug Commands
+4. **Gas estimation showing N/A**
+   - Some networks may not support gas estimation
+   - Transaction will still work, just estimate manually
+   - Check console for detailed errors
+
+### Debug Tips
 
 ```bash
-# Check contract sizes
-pnpm contracts:build && ls -la packages/contracts/artifacts
+# Check build issues
+pnpm build
 
-# Verify deployment
-npx hardhat verify --network sepolia <contract-address>
+# View detailed error logs
+pnpm dev
+# Then check browser console (F12)
 
-# Check frontend build
-pnpm frontend:build --debug
+# Clear Next.js cache
+rm -rf .next
+pnpm dev
 ```
 
 ## Contributing
 
 1. Fork repository
 2. Create feature branch
-3. Write tests for new features
-4. Ensure all tests pass
-5. Submit pull request
+3. Follow code standards in `.copilot.instructions.md`
+4. Test your changes thoroughly
+5. Submit pull request with clear description
 
 ## License
 
@@ -552,4 +487,3 @@ MIT License - see LICENSE file for more details.
 - [EIP-7702 Specification](https://eips.ethereum.org/EIPS/eip-7702)
 - [Viem Documentation](https://viem.sh)
 - [Next.js 15 Docs](https://nextjs.org/docs)
-- [Hardhat Documentation](https://hardhat.org/docs)
